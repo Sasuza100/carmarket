@@ -94,7 +94,7 @@ def user_data_update(user_id, username="NULL",  restart=False):
             print("Соединение с SQLite закрыто user_data_update")
 
 
-def get_user_data(user_id, task_status=False, right_variant=False, task_number=False):
+def get_user_data(user_id):
     try:
         sqlite_connection = sqlite3.connect('sqlite_python.db')
         cursor = sqlite_connection.cursor()
@@ -102,18 +102,8 @@ def get_user_data(user_id, task_status=False, right_variant=False, task_number=F
         sql_select_query = """select * from user_data where user_id = ?"""
         cursor.execute(sql_select_query, (str(user_id),))
         records = cursor.fetchall()
-        data = ()
-        if task_status:
-            for row in records:
-                data += (row[2],)
-        if right_variant:
-            for row in records:
-                data += (row[3],)
-        if task_number:
-            for row in records:
-                data += (row[4],)
-        cursor.close()
-        return data
+        print(records)
+
 
     except sqlite3.Error as error:
         print("Ошибка при работе с SQLite", error)
