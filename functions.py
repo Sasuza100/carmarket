@@ -57,7 +57,9 @@ def get_user_data(user_id):
         sql_select_query = """select * from user_data where user_id = ?"""
         cursor.execute(sql_select_query, (str(user_id),))
         records = cursor.fetchall()
-        print(records)
+        print(records[0][-1])
+        print(records[0][-2])
+        return records[0][-2]
 
 
     except sqlite3.Error as error:

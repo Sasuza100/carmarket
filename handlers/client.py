@@ -34,19 +34,21 @@ async def process_decs_car_ex(message: types.Message, state: FSMContext):
 
 async def collect_data_with_car(message: types.Message, state: FSMContext):
     print('collect_data_with_car')
-    photoes = dict()
     try:
         async with state.proxy() as data:
             data['photo'] = message.photo[0].file_id
-            photoes.append(data['photo'])
-            print(photoes)
+            print(message.media_group_id)                                                   #message.media_group_id
+            album = MediaGroup()
+            print(data['photo'])
+            album.attach_photo(photo=data['photo'])
+            print(album)
             await message.reply("Спасибо за публикацию")
-
+            await message.answer_media_group(media=album)
             await FSMAdd.next()
     except:
         await message.reply("Прикрепи фото")
         dp.register_message_handler(collect_data_with_car, state=FSMAdd.collect_data_with_car)
-    await message.answer_media_group(media=photoes)
+
 
 
 async def process_send_to_moder(message: types.Message, state: FSMContext):
