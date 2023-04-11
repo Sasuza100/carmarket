@@ -3,7 +3,7 @@ from aiogram.types import MediaGroup
 from create_bot import dp, bot
 from functions import *
 from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters.state import  State, StatesGroup
+from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
 class FSMAdd(StatesGroup):
@@ -14,15 +14,20 @@ class FSMAdd(StatesGroup):
 
 
 
-async def process_start_command(message: types.Message,state: None):
+async def process_start_command(message: types.Message):
     user_id = message.from_user.id
     username = message.from_user.username
     user_data_create(username, user_id)
     get_user_data(user_id)
-    await FSMAdd.desc_ex.set()
+    print(get_user_data(user_id))
     await bot.send_message(message.from_user.id,
                            "Привет, отправь сюда свою машину по примеру, и мы опубликуем ее в канале @...")
 
+
+
+
+async def temp(message: types.Message, state: None):
+    await FSMAdd.desc_ex.set()
 
 async def process_decs_car_ex(message: types.Message, state: FSMContext):
     print('process_decs_car_ex')
@@ -62,7 +67,8 @@ async def process_send_to_moder(message: types.Message, state: FSMContext):
 
 
 def register_handlers_client(dp: Dispatcher):
-    dp.register_message_handler(process_start_command, commands=['start'], state=None)
+    dp.register_message_handler(process_start_command, commands=['start'])
+    dp.register_message_handler(process_start_command, commands=['rty'], state=None)
     dp.register_message_handler(process_decs_car_ex, commands=['qwe'], state=FSMAdd.desc_ex)
     dp.register_message_handler(collect_data_with_car,  state=FSMAdd.collect_data_with_car, content_types=['photo'])
     dp.register_message_handler(process_send_to_moder, state=FSMAdd.send_to_moder)
