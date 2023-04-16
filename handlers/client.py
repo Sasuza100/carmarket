@@ -20,13 +20,21 @@ async def process_start_command(message: types.Message):
     user_data_create(username, user_id)
     get_user_data(user_id)
     print(get_user_data(user_id))
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    buttons = ["Я хочу продать машину"]
+    keyboard.add(*buttons)
     await bot.send_message(message.from_user.id,
-                           "Привет, отправь сюда свою машину по примеру, и мы опубликуем ее в канале @...")
+                           "Привет, этот бот поможет тебе опубликовать машину в нашем автосалоне", reply_markup=keyboard)
 
 
 
 
 async def temp(message: types.Message, state: None):
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    buttons = ["Показать пример"]
+    keyboard.add(*buttons)
+    await bot.send_message(message.from_user.id,
+                           "Отлично, тогда ознакомься с примером", reply_markup=keyboard)
     await FSMAdd.desc_ex.set()
 
 async def process_decs_car_ex(message: types.Message, state: FSMContext):
@@ -36,23 +44,30 @@ async def process_decs_car_ex(message: types.Message, state: FSMContext):
     await FSMAdd.next()
 
 
+global album
+album = []
 
 async def collect_data_with_car(message: types.Message, state: FSMContext):
     print('collect_data_with_car')
     try:
+
         async with state.proxy() as data:
-            data['photo'] = message.photo[0].file_id
-            print(message.media_group_id)                                                   #message.media_group_id
-            album = MediaGroup()
-            print(data['photo'])
-            album.attach_photo(photo=data['photo'])
+            data['photo'] = message.photo[-1].file_id
+            print(message.media_group_id)
+
+            print(data)
+            album.append({"media" : data['photo'], "type" : "photo"})
             print(album)
-            await message.reply("Спасибо за публикацию")
-            await message.answer_media_group(media=album)
-            await FSMAdd.next()
+            # await message.reply("Спасибо за публикацию")
+
+
     except:
         await message.reply("Прикрепи фото")
         dp.register_message_handler(collect_data_with_car, state=FSMAdd.collect_data_with_car)
+    finally:
+        await bot.send_media_group(message.from_user.id, media=album)
+        await FSMAdd.next()
+
 
 
 
@@ -65,11 +80,10 @@ async def process_send_to_moder(message: types.Message, state: FSMContext):
 
 
 
-
 def register_handlers_client(dp: Dispatcher):
     dp.register_message_handler(process_start_command, commands=['start'])
-    dp.register_message_handler(process_start_command, commands=['rty'], state=None)
-    dp.register_message_handler(process_decs_car_ex, commands=['qwe'], state=FSMAdd.desc_ex)
+    dp.register_message_handler(temp, lambda message: message.text == "Я хочу продать машину", state=None)
+    dp.register_message_handler(process_decs_car_ex, lambda message: message.text == "Показать пример", state=FSMAdd.desc_ex)
     dp.register_message_handler(collect_data_with_car,  state=FSMAdd.collect_data_with_car, content_types=['photo'])
     dp.register_message_handler(process_send_to_moder, state=FSMAdd.send_to_moder)
 
