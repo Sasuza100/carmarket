@@ -79,11 +79,10 @@ async def process_send_to_moder(message: types.Message, state: FSMContext):
 
 
 
-
 def register_handlers_client(dp: Dispatcher):
     dp.register_message_handler(process_start_command, commands=['start'])
     dp.register_message_handler(temp, lambda message: message.text == "Я хочу продать машину", state=None)
     dp.register_message_handler(process_decs_car_ex, lambda message: message.text == "Показать пример", state=FSMAdd.desc_ex)
-    dp.register_message_handler(collect_data_with_car,  state=FSMAdd.collect_data_with_car, content_types=['photo'])
+    dp.register_message_handler(answer_q3,  state=FSMAdd.collect_data_with_car, content_types=['photo'])
     dp.register_message_handler(process_send_to_moder, state=FSMAdd.send_to_moder)
 
